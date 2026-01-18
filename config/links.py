@@ -1,9 +1,8 @@
 class Links:
     HOST = "https://www.saucedemo.com/"
     LOGIN_PAGE = f"{HOST}"
-    PRODUCTS_PAGE = f"{HOST}/inventory.html"
-
-    HOST_DEMO_QA = "https://demoqa.com"
-    CHECK_BOX = f"{HOST_DEMO_QA}/checkbox"
-    RADIO_BUTTON = f"{HOST_DEMO_QA}/radio-button"
-    BUTTONS = f"{HOST_DEMO_QA}/buttons"
+    PRODUCTS_PAGE = f"{HOST}inventory.html"
+    CART_PAGE = f"{HOST}cart.html"
+    CHECKOUT_PAGE = f"{HOST}checkout-step-one.html"
+    CHECKOUT_OVERVIEW_PAGE = f"{HOST}checkout-step-two.html"
+    CHECKOUT_COMPLETE_PAGE = f"{HOST}checkout-complete.html"
