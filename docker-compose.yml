@@ -1,0 +1,45 @@
+# реализовал 2 сервиса.
+# smoke: тестирую /tests/test_smoke.py | для запуска использовать команду в терминале:
+# "docker compose run --rm smoke"
+
+# regression: тестирую все тесты во всех папках | для запуска использовать команду в терминале:
+# "docker compose run --rm regression"
+
+services:
+  smoke:
+    build: .
+    volumes: [ ".:/usr/workspace" ]
+    working_dir: /usr/workspace
+    environment:
+      LOGIN: ${LOGIN}
+      PASSWORD: ${PASSWORD}
+      FIRST_NAME: ${FIRST_NAME}
+      LAST_NAME: ${LAST_NAME}
+      ZIP_CODE: ${ZIP_CODE}
+    command: >
+      sh -c '
+        pytest -sv tests/test_smoke.py --alluredir=allure-results || true;
+        if [ -d allure-report/history ]; then
+          mkdir -p allure-results/history && cp -r allure-report/history/* allure-results/history/ || true;
+        fi;
+        allure generate allure-results -o allure-report --clean
+      '
+
+  regression:
+    build: .
+    volumes: [ ".:/usr/workspace" ]
+    working_dir: /usr/workspace
+    environment:
+      LOGIN: ${LOGIN}
+      PASSWORD: ${PASSWORD}
+      FIRST_NAME: ${FIRST_NAME}
+      LAST_NAME: ${LAST_NAME}
+      ZIP_CODE: ${ZIP_CODE}
+    command: >
+      sh -c '
+        pytest -sv --alluredir=allure-results || true;
+        if [ -d allure-report/history ]; then
+          mkdir -p allure-results/history && cp -r allure-report/history/* allure-results/history/ || true;
+        fi;
+        allure generate allure-results -o allure-report --clean
+      '

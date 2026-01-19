@@ -40,10 +40,6 @@ class TestSmoke(BaseTest):
         self.checkoutOverviewPage.check_label()
         self.checkoutOverviewPage.check_card_item()
         self.checkoutOverviewPage.transfer_checkout_complete_page()
-        # self.checkoutOverviewPage.
-        # self.checkoutOverviewPage.
-        # self.checkoutOverviewPage.
-        # self.checkoutOverviewPage.
 
         # checkoutCompletePage
         self.checkoutCompletePage.check_label()
