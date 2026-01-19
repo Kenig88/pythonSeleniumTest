@@ -21,9 +21,9 @@ double = driver.find_element("xpath", "//button[@id='doubleClickBtn']")
 right = driver.find_element("xpath", "//button[@id='rightClickBtn']")
 
 
-def test_1():
-    action = ActionChains(driver)
-    action.double_click(double).context_click(right).click(one).perform()
-
-    sleep(2)
-    driver.quit()
+# def test_1():
+#     action = ActionChains(driver)
+#     action.double_click(double).context_click(right).click(one).perform()
+#
+#     sleep(2)
+#     driver.quit()

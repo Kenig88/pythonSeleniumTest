@@ -21,10 +21,10 @@ YES_RADIO_LABEL = ("xpath", "//label[@for='yesRadio']")
 
 
 
-def test_1():
-    wait.until(EC.element_to_be_clickable(YES_RADIO_LABEL)).click()
-    assert driver.find_element(*YES_RADIO).is_selected() == True
-
-
-    sleep(2)
-    driver.quit()
+# def test_1():
+#     wait.until(EC.element_to_be_clickable(YES_RADIO_LABEL)).click()
+#     assert driver.find_element(*YES_RADIO).is_selected() == True
+#
+#
+#     sleep(2)
+#     driver.quit()

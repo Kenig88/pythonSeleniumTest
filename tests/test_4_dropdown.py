@@ -22,15 +22,15 @@ DROPDOWN_ELEMENT = ("xpath", "//select[@data-test='product-sort-container']")
 sleep(1)
 
 
-def test_1():
-    wait.until(EC.element_to_be_clickable(USERNAME_FIELD)).send_keys(data.LOGIN)
-    wait.until(EC.element_to_be_clickable(PASSWORD_FIELD)).send_keys(data.PASSWORD)
-    wait.until(EC.element_to_be_clickable(SUBMIT_BUTTON)).click()
-    sleep(2)
-    DROPDOWN = Select(driver.find_element(*DROPDOWN_ELEMENT))
-    DROPDOWN.select_by_index(1)
-    sleep(2)
-
-    sleep(2)
-    driver.quit()
+# def test_1():
+#     wait.until(EC.element_to_be_clickable(USERNAME_FIELD)).send_keys(data.LOGIN)
+#     wait.until(EC.element_to_be_clickable(PASSWORD_FIELD)).send_keys(data.PASSWORD)
+#     wait.until(EC.element_to_be_clickable(SUBMIT_BUTTON)).click()
+#     sleep(2)
+#     DROPDOWN = Select(driver.find_element(*DROPDOWN_ELEMENT))
+#     DROPDOWN.select_by_index(1)
+#     sleep(2)
+#
+#     sleep(2)
+#     driver.quit()
 

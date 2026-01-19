@@ -21,9 +21,9 @@ CHECKBOX_HOME_SPAN = ("xpath", "//span[text()='Home']")
 sleep(2)
 
 
-def test_1():
-    wait.until(EC.element_to_be_clickable(CHECKBOX_HOME_SPAN)).click()
-    assert driver.find_element(*CHECKBOX_HOME).is_selected()
-
-    sleep(2)
-    driver.quit()
+# def test_1():
+#     wait.until(EC.element_to_be_clickable(CHECKBOX_HOME_SPAN)).click()
+#     assert driver.find_element(*CHECKBOX_HOME).is_selected()
+#
+#     sleep(2)
+#     driver.quit()

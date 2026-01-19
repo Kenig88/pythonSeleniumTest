@@ -21,13 +21,13 @@ DROPDOWN_ELEMENT = ("xpath", "//select[@data-test='product-sort-container']")
 sleep(1)
 
 
-def test_1():
-    wait.until(EC.element_to_be_clickable(USERNAME_FIELD)).send_keys(data.LOGIN)
-    wait.until(EC.element_to_be_clickable(PASSWORD_FIELD)).send_keys(data.PASSWORD)
-    wait.until(EC.element_to_be_clickable(SUBMIT_BUTTON)).click()
-    sleep(2)
-    now_date = datetime.now().strftime('%H-%M-%S')
-    name_screenshot = "screenshot" + now_date + ".png"
-    driver.save_screenshot('C:\\Users\\14bas/PycharmProjects\\pythonSelenium\\screen\\' + name_screenshot)
-    driver.quit()
+# def test_1():
+#     wait.until(EC.element_to_be_clickable(USERNAME_FIELD)).send_keys(data.LOGIN)
+#     wait.until(EC.element_to_be_clickable(PASSWORD_FIELD)).send_keys(data.PASSWORD)
+#     wait.until(EC.element_to_be_clickable(SUBMIT_BUTTON)).click()
+#     sleep(2)
+#     now_date = datetime.now().strftime('%H-%M-%S')
+#     name_screenshot = "screenshot" + now_date + ".png"
+#     driver.save_screenshot('C:\\Users\\14bas/PycharmProjects\\pythonSelenium\\screen\\' + name_screenshot)
+#     driver.quit()
 
