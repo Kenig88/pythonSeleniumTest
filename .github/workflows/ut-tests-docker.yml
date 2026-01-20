@@ -67,12 +67,12 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
-      # Чтобы Pages не пытался Jekyll-сборку (важно для статических генераторов/Allure)
-      - name: Disable Jekyll for GitHub Pages
-        if: always()
-        run: |
-          mkdir -p allure-report
-          touch allure-report/.nojekyll
+#      # Чтобы Pages не пытался Jekyll-сборку (важно для статических генераторов/Allure)
+#      - name: Disable Jekyll for GitHub Pages
+#        if: always()
+#        run: |
+#          mkdir -p allure-report
+#          touch allure-report/.nojekyll
 
       - name: Deploy to GitHub Pages (gh-pages branch)
         if: always()
