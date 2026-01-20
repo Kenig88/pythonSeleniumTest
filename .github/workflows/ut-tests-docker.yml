@@ -12,6 +12,10 @@ on:
           - smoke
           - regression
 
+# Нужно для пуша в gh-pages через GITHUB_TOKEN
+permissions:
+  contents: write
+
 jobs:
   ui-tests:
     runs-on: ubuntu-latest
@@ -20,6 +24,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Docker info
         run: |
@@ -29,16 +35,20 @@ jobs:
       - name: Build image(s)
         run: docker compose build
 
-      - name: Run selected suite
+      # ВАЖНО: не даём шагу "уронить" job сразу — сохраняем exit code
+      - name: Run selected suite (capture exit code)
         env:
           LOGIN: ${{ secrets.LOGIN }}
           PASSWORD: ${{ secrets.PASSWORD }}
           FIRST_NAME: ${{ secrets.FIRST_NAME }}
           LAST_NAME: ${{ secrets.LAST_NAME }}
           ZIP_CODE: ${{ secrets.ZIP_CODE }}
-        run: docker compose run --rm ${{ inputs.suite }}
+        run: |
+          set +e
+          docker compose run --rm ${{ inputs.suite }}
+          echo "TEST_EXIT=$?" >> $GITHUB_ENV
+          exit 0
 
-      # Всегда сохраняем результаты, даже если тесты упали (job станет красным из-за exit code pytest)
       - name: Upload Allure results
         if: always()
         uses: actions/upload-artifact@v4
@@ -56,6 +66,33 @@ jobs:
           path: allure-report
           if-no-files-found: warn
           retention-days: 7
+
+      # Чтобы Pages не пытался Jekyll-сборку (важно для статических генераторов/Allure)
+      - name: Disable Jekyll for GitHub Pages
+        if: always()
+        run: |
+          mkdir -p allure-report
+          touch allure-report/.nojekyll
+
+      - name: Deploy to GitHub Pages (gh-pages branch)
+        if: always()
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.CI_TOKEN }}
+          branch: gh-pages
+          folder: allure-report
+          clean: true
+          single-commit: true
+
+      # В конце возвращаем реальный результат тестов — чтобы CI был красным при падениях
+      - name: Fail job if tests failed
+        if: always()
+        run: |
+          echo "Pytest exit code: $TEST_EXIT"
+          if [ "${TEST_EXIT:-0}" -ne 0 ]; then
+            exit "$TEST_EXIT"
+          fi
+
 
 
 
