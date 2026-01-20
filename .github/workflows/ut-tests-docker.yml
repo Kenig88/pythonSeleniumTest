@@ -12,7 +12,6 @@ on:
           - smoke
           - regression
 
-# Нужно для пуша в gh-pages через GITHUB_TOKEN
 permissions:
   contents: write
 
@@ -22,10 +21,29 @@ jobs:
     timeout-minutes: 60
 
     steps:
+      # 1) Основная ветка (код тестов)
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      # 2) Ветка gh-pages (чтобы забрать прошлый history)
+      - name: Checkout gh-pages (previous report)
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: prev-pages
+        continue-on-error: true
+
+      - name: Restore Allure history from gh-pages
+        run: |
+          if [ -d prev-pages/history ]; then
+            mkdir -p allure-report/history
+            cp -r prev-pages/history/* allure-report/history/ || true
+            echo "Restored history from gh-pages"
+          else
+            echo "No previous history found (first run or gh-pages empty)"
+          fi
 
       - name: Docker info
         run: |
@@ -35,7 +53,7 @@ jobs:
       - name: Build image(s)
         run: docker compose build
 
-      # ВАЖНО: не даём шагу "уронить" job сразу — сохраняем exit code
+      # 3) Запуск тестов (не роняем job сразу)
       - name: Run selected suite (capture exit code)
         env:
           LOGIN: ${{ secrets.LOGIN }}
@@ -67,24 +85,18 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
-#      # Чтобы Pages не пытался Jekyll-сборку (важно для статических генераторов/Allure)
-#      - name: Disable Jekyll for GitHub Pages
-#        if: always()
-#        run: |
-#          mkdir -p allure-report
-#          touch allure-report/.nojekyll
-
+      # 4) Деплой в gh-pages (Pages должен быть: Deploy from a branch -> gh-pages /(root))
       - name: Deploy to GitHub Pages (gh-pages branch)
         if: always()
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          token: ${{ secrets.CI_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
           folder: allure-report
           clean: true
           single-commit: true
 
-      # В конце возвращаем реальный результат тестов — чтобы CI был красным при падениях
+      # 5) В конце возвращаем реальный результат тестов — чтобы CI был красным при падениях
       - name: Fail job if tests failed
         if: always()
         run: |
@@ -92,6 +104,101 @@ jobs:
           if [ "${TEST_EXIT:-0}" -ne 0 ]; then
             exit "$TEST_EXIT"
           fi
+
+
+
+
+
+
+# второй бэкап
+#name: UI tests (Docker Compose)
+#
+#on:
+#  workflow_dispatch:
+#    inputs:
+#      suite:
+#        description: "Test suite to run"
+#        type: choice
+#        required: true
+#        default: smoke
+#        options:
+#          - smoke
+#          - regression
+#
+## Нужно для пуша в gh-pages через GITHUB_TOKEN
+#permissions:
+#  contents: write
+#
+#jobs:
+#  ui-tests:
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 60
+#
+#    steps:
+#      - name: Checkout repo
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Docker info
+#        run: |
+#          docker --version
+#          docker compose version
+#
+#      - name: Build image(s)
+#        run: docker compose build
+#
+#      # ВАЖНО: не даём шагу "уронить" job сразу — сохраняем exit code
+#      - name: Run selected suite (capture exit code)
+#        env:
+#          LOGIN: ${{ secrets.LOGIN }}
+#          PASSWORD: ${{ secrets.PASSWORD }}
+#          FIRST_NAME: ${{ secrets.FIRST_NAME }}
+#          LAST_NAME: ${{ secrets.LAST_NAME }}
+#          ZIP_CODE: ${{ secrets.ZIP_CODE }}
+#        run: |
+#          set +e
+#          docker compose run --rm ${{ inputs.suite }}
+#          echo "TEST_EXIT=$?" >> $GITHUB_ENV
+#          exit 0
+#
+#      - name: Upload Allure results
+#        if: always()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: allure-results-${{ inputs.suite }}
+#          path: allure-results
+#          if-no-files-found: warn
+#          retention-days: 7
+#
+#      - name: Upload Allure report
+#        if: always()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: allure-report-${{ inputs.suite }}
+#          path: allure-report
+#          if-no-files-found: warn
+#          retention-days: 7
+#
+#
+#      - name: Deploy to GitHub Pages (gh-pages branch)
+#        if: always()
+#        uses: JamesIves/github-pages-deploy-action@v4
+#        with:
+#          token: ${{ secrets.CI_TOKEN }}
+#          branch: gh-pages
+#          folder: allure-report
+#          clean: true
+#          single-commit: true
+#
+#      # В конце возвращаем реальный результат тестов — чтобы CI был красным при падениях
+#      - name: Fail job if tests failed
+#        if: always()
+#        run: |
+#          echo "Pytest exit code: $TEST_EXIT"
+#          if [ "${TEST_EXIT:-0}" -ne 0 ]; then
+#            exit "$TEST_EXIT"
+#          fi
 
 
 
