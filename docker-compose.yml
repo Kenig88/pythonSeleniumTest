@@ -22,16 +22,19 @@ services:
         pytest -sv tests/test_smoke.py --alluredir=allure-results;
         TEST_EXIT=$?;
 
-        # подтягиваем history из предыдущего allure-report (если есть)
+        # подтягиваю history из предыдущего allure-report 
         if [ -d allure-report/history ]; then
           mkdir -p allure-results/history;
           cp -r allure-report/history/* allure-results/history/ || true;
         fi;
 
-        # генерим report всегда (даже если pytest упал)
+        # генерю report всегда (даже если pytest упал)
         allure generate allure-results -o allure-report --clean || true;
 
-        # возвращаем реальный exit code pytest (чтобы CI краснел)
+        # отключаю Jekyll для GitHub Pages
+        touch allure-report/.nojekyll || true;
+
+        # возвращаю реальный exit code pytest (чтобы CI краснел)
         exit $TEST_EXIT
       '
 
@@ -57,6 +60,72 @@ services:
 
         allure generate allure-results -o allure-report --clean || true;
 
+        # отключаю Jekyll для GitHub Pages
+        touch allure-report/.nojekyll || true;
+
         exit $TEST_EXIT
       '
+
+
+
+
+
+
+
+
+
+
+#services:
+#  smoke:
+#    build: .
+#    volumes: [ ".:/usr/workspace" ]
+#    working_dir: /usr/workspace
+#    environment:
+#      LOGIN: ${LOGIN}
+#      PASSWORD: ${PASSWORD}
+#      FIRST_NAME: ${FIRST_NAME}
+#      LAST_NAME: ${LAST_NAME}
+#      ZIP_CODE: ${ZIP_CODE}
+#    command: >
+#      sh -c '
+#        pytest -sv tests/test_smoke.py --alluredir=allure-results;
+#        TEST_EXIT=$?;
+#
+#        # подтягиваю history из предыдущего allure-report
+#        if [ -d allure-report/history ]; then
+#          mkdir -p allure-results/history;
+#          cp -r allure-report/history/* allure-results/history/ || true;
+#        fi;
+#
+#        # генерю report всегда (даже если pytest упал)
+#        allure generate allure-results -o allure-report --clean || true;
+#
+#        # возвращаю реальный exit code pytest (чтобы CI краснел)
+#        exit $TEST_EXIT
+#      '
+#
+#  regression:
+#    build: .
+#    volumes: [ ".:/usr/workspace" ]
+#    working_dir: /usr/workspace
+#    environment:
+#      LOGIN: ${LOGIN}
+#      PASSWORD: ${PASSWORD}
+#      FIRST_NAME: ${FIRST_NAME}
+#      LAST_NAME: ${LAST_NAME}
+#      ZIP_CODE: ${ZIP_CODE}
+#    command: >
+#      sh -c '
+#        pytest -sv --alluredir=allure-results;
+#        TEST_EXIT=$?;
+#
+#        if [ -d allure-report/history ]; then
+#          mkdir -p allure-results/history;
+#          cp -r allure-report/history/* allure-results/history/ || true;
+#        fi;
+#
+#        allure generate allure-results -o allure-report --clean || true;
+#
+#        exit $TEST_EXIT
+#      '
 
