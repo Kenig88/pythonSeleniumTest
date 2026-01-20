@@ -1,8 +1,6 @@
 from tests.base_test import BaseTest
-from time import sleep
 import pytest
 import allure
-
 
 
 @allure.feature("Smoke test")
@@ -47,4 +45,3 @@ class TestSmoke(BaseTest):
         self.checkoutCompletePage.check_complete_description()
         self.checkoutCompletePage.click_back_to_products_page()
 
-        sleep(1)

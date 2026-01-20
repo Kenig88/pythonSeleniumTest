@@ -5,6 +5,7 @@
 # regression: тестирую все тесты во всех папках | для запуска использовать команду в терминале:
 # "docker compose run --rm regression"
 
+
 services:
   smoke:
     build: .
@@ -18,11 +19,20 @@ services:
       ZIP_CODE: ${ZIP_CODE}
     command: >
       sh -c '
-        pytest -sv tests/test_smoke.py --alluredir=allure-results || true;
+        pytest -sv tests/test_smoke.py --alluredir=allure-results;
+        TEST_EXIT=$?;
+
+        # подтягиваем history из предыдущего allure-report (если есть)
         if [ -d allure-report/history ]; then
-          mkdir -p allure-results/history && cp -r allure-report/history/* allure-results/history/ || true;
+          mkdir -p allure-results/history;
+          cp -r allure-report/history/* allure-results/history/ || true;
         fi;
-        allure generate allure-results -o allure-report --clean
+
+        # генерим report всегда (даже если pytest упал)
+        allure generate allure-results -o allure-report --clean || true;
+
+        # возвращаем реальный exit code pytest (чтобы CI краснел)
+        exit $TEST_EXIT
       '
 
   regression:
@@ -37,9 +47,16 @@ services:
       ZIP_CODE: ${ZIP_CODE}
     command: >
       sh -c '
-        pytest -sv --alluredir=allure-results || true;
+        pytest -sv --alluredir=allure-results;
+        TEST_EXIT=$?;
+
         if [ -d allure-report/history ]; then
-          mkdir -p allure-results/history && cp -r allure-report/history/* allure-results/history/ || true;
+          mkdir -p allure-results/history;
+          cp -r allure-report/history/* allure-results/history/ || true;
         fi;
-        allure generate allure-results -o allure-report --clean
+
+        allure generate allure-results -o allure-report --clean || true;
+
+        exit $TEST_EXIT
       '
+
