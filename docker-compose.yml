@@ -22,7 +22,7 @@ services:
         pytest -sv tests/test_smoke.py --alluredir=allure-results;
         TEST_EXIT=$?;
 
-        # подтягиваю history из предыдущего allure-report
+        # подтягиваю history из предыдущего allure-report 
         if [ -d allure-report/history ]; then
           mkdir -p allure-results/history;
           cp -r allure-report/history/* allure-results/history/ || true;
@@ -30,6 +30,9 @@ services:
 
         # генерю report всегда (даже если pytest упал)
         allure generate allure-results -o allure-report --clean || true;
+
+        # отключаю Jekyll для GitHub Pages
+        touch allure-report/.nojekyll || true;
 
         # возвращаю реальный exit code pytest (чтобы CI краснел)
         exit $TEST_EXIT
@@ -56,6 +59,9 @@ services:
         fi;
 
         allure generate allure-results -o allure-report --clean || true;
+
+        # отключаю Jekyll для GitHub Pages
+        touch allure-report/.nojekyll || true;
 
         exit $TEST_EXIT
       '
