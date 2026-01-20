@@ -59,4 +59,3 @@ services:
 
         exit $TEST_EXIT
       '
-
